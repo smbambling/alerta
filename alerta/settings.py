@@ -205,7 +205,7 @@ GOOGLE_TRACKING_ID = None
 AUTO_REFRESH_INTERVAL = 5000  # ms
 
 # Plugins
-PLUGINS = ['remote_ip', 'reject', 'heartbeat', 'blackout']
+PLUGINS = ['remote_ip', 'reject', 'heartbeat', 'blackout', 'forwarder']
 PLUGINS_RAISE_ON_ERROR = True  # raise RuntimeError exception on first failure
 
 # reject plugin settings
@@ -218,3 +218,8 @@ BLACKOUT_DURATION = 3600  # default period = 1 hour
 NOTIFICATION_BLACKOUT = False  # True - set alert status=blackout, False - do not process alert (default)
 BLACKOUT_ACCEPT = []  # type: List[str]
 # BLACKOUT_ACCEPT = ['normal', 'ok', 'cleared']  # list of severities accepted during blackout period
+
+# northbound interface
+FWD_DESTINATIONS = [
+    # ('http://localhost:9000', 'access_key', ['fwd', 'actions'])
+]
