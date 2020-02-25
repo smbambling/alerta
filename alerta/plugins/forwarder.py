@@ -17,6 +17,11 @@ LOG = logging.getLogger('alerta.plugins.forwarder')
 X_LOOP_HEADER = 'X-Alerta-Loop'
 
 
+def http_origin():
+    print(request.base_url)
+    return '{SERVER_NAME}:{SERVER_PORT}'.format(**request.environ) or request.base_url
+
+
 def append_to_header(origin):
     header = [x.strip() for x in request.headers.get(X_LOOP_HEADER, '').split(',') if x != '']
     header.append(origin)
@@ -51,12 +56,12 @@ class Forwarder(PluginBase):
 
         print('post-receive: forward alert to remotes...')
 
-        origin = absolute_url()
+        origin = http_origin()
         x_loop = request.headers.get(X_LOOP_HEADER, '')
 
         for remote, access_key, secret_key, actions in self.get_config('FWD_DESTINATIONS', default=[], type=list, **kwargs):
 
-            if remote in x_loop:
+            if remote.replace(r'https?://', '') in x_loop:
                 print('post-receive: remote {} is in xloop. do not forward.'.format(remote))
                 continue
 
@@ -88,7 +93,7 @@ class Forwarder(PluginBase):
         print('take-action: start...')
 
         # guard against forwarding loops
-        origin = absolute_url()
+        origin = http_origin()
         x_loop = request.headers.get(X_LOOP_HEADER, '')
 
         if origin in x_loop:
@@ -99,7 +104,7 @@ class Forwarder(PluginBase):
 
         for remote, access_key, secret_key, actions in self.get_config('FWD_DESTINATIONS', default=[], type=list, **kwargs):
 
-            if remote in x_loop:
+            if remote.replace(r'https?://', '') in x_loop:
                 print('take-action: remote {} is in xloop. do not forward action.'.format(remote))
                 continue
 
@@ -122,10 +127,12 @@ class Forwarder(PluginBase):
         return alert
 
     def delete(self, alert: 'Alert', **kwargs) -> bool:
+
+        print(request.environ)
         print('delete: start...')
 
         # guard against forwarding loops
-        origin = absolute_url()
+        origin = http_origin()
         x_loop = request.headers.get(X_LOOP_HEADER, '')
 
         print('origin={}'.format(origin))
@@ -139,7 +146,7 @@ class Forwarder(PluginBase):
 
         for remote, access_key, secret_key, actions in self.get_config('FWD_DESTINATIONS', default=[], type=list, **kwargs):
 
-            if remote in x_loop:
+            if remote.replace('http://', '') in x_loop:
                 print('delete: remote {} is in xloop. do not forward delete.'.format(remote))
                 continue
 
