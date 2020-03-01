@@ -18,8 +18,7 @@ X_LOOP_HEADER = 'X-Alerta-Loop'
 
 
 def http_origin():
-    print(request.base_url)
-    return '{SERVER_NAME}:{SERVER_PORT}'.format(**request.environ) or request.base_url
+    return absolute_url()
 
 
 def append_to_header(origin):
@@ -36,13 +35,13 @@ class Forwarder(PluginBase):
 
     def pre_receive(self, alert: 'Alert', **kwargs) -> 'Alert':
 
-        print('pre-receive: origin={}. fix BASE_URL if necessary!'.format(absolute_url()))
-
         print('pre-receive: start...')
 
         # guard against forwarding loops
-        origin = absolute_url()
+        origin = http_origin()
         x_loop = request.headers.get(X_LOOP_HEADER, '')
+
+        print('pre-receive: origin={}'.format(origin))
 
         print(request.headers)
         if origin in x_loop:
