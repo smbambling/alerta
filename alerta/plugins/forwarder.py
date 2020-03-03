@@ -60,12 +60,12 @@ class Forwarder(PluginBase):
 
         for remote, access_key, secret_key, actions in self.get_config('FWD_DESTINATIONS', default=[], type=list, **kwargs):
 
-            if remote.replace(r'https?://', '') in x_loop:
+            if remote in x_loop:
                 print('post-receive: remote {} is in xloop. do not forward.'.format(remote))
                 continue
 
             if not ('*' in actions or 'fwd' in actions):
-                print('post-receive: alert forwarding forbidden.')
+                print('post-receive: alert forwarding not configured.')
                 continue
 
             print('post-receive: forward alert to {}...'.format(remote))
@@ -103,7 +103,7 @@ class Forwarder(PluginBase):
 
         for remote, access_key, secret_key, actions in self.get_config('FWD_DESTINATIONS', default=[], type=list, **kwargs):
 
-            if remote.replace(r'https?://', '') in x_loop:
+            if remote in x_loop:
                 print('take-action: remote {} is in xloop. do not forward action.'.format(remote))
                 continue
 
@@ -145,7 +145,7 @@ class Forwarder(PluginBase):
 
         for remote, access_key, secret_key, actions in self.get_config('FWD_DESTINATIONS', default=[], type=list, **kwargs):
 
-            if remote.replace('http://', '') in x_loop:
+            if remote in x_loop:
                 print('delete: remote {} is in xloop. do not forward delete.'.format(remote))
                 continue
 
