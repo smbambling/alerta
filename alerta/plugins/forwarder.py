@@ -49,6 +49,9 @@ class Forwarder(PluginBase):
             raise ForwardingLoop('Alert {} already processed by {}. Ignoring.'.format(alert.id, origin))
 
         print('pre-receive: allow...')
+
+        alert.attributes['http_origin'] = origin
+
         return alert
 
     def post_receive(self, alert: 'Alert', **kwargs) -> Optional['Alert']:
