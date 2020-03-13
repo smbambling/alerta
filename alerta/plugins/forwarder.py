@@ -50,7 +50,8 @@ class Forwarder(PluginBase):
 
         print('pre-receive: allow...')
 
-        alert.attributes['http_origin'] = origin
+        if not x_loop:
+            alert.attributes['http_origin'] = origin
 
         return alert
 
@@ -150,6 +151,11 @@ class Forwarder(PluginBase):
 
             if remote in x_loop:
                 print('delete: remote {} is in xloop. do not forward delete.'.format(remote))
+                continue
+
+            if (not x_loop or remote != alert.attributes['http_origin'][:-1] and origin != alert.attributes['http_origin']):
+                print('LOOK HERE: {}'.format( alert.attributes['http_origin']))
+                print('delete: remote {} is not the alert origin. do not forward delete'.format(remote))
                 continue
 
             if not ('*' in actions or 'actions' in actions or 'delete' in actions):
